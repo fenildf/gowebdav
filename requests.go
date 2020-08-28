@@ -42,7 +42,7 @@ func (c *Client) req(method, path string, body io.Reader, intercept func(*http.R
 		return nil, err
 	}
 
-	if rs.StatusCode == 401 && c.auth.Type() == "NoAuth" {
+	if rs.StatusCode == 401 || c.auth.Type() == "NoAuth" {
 
 		wwwAuthenticateHeader := strings.ToLower(rs.Header.Get("Www-Authenticate"))
 
@@ -62,7 +62,7 @@ func (c *Client) req(method, path string, body io.Reader, intercept func(*http.R
 			return c.req(method, path, &ba, intercept)
 		}
 
-	} else if rs.StatusCode == 401 {
+	} else if rs.StatusCode == 403 {
 		return rs, newPathError("Authorize", c.root, rs.StatusCode)
 	}
 
